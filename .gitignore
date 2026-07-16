@@ -1,0 +1,31 @@
+# === macOS / OS 元数据 ===
+.DS_Store
+__MACOSX/
+.AppleDouble/
+.LSOverride
+
+# === 构建产物（分发 zip 不入库） ===
+*.zip
+
+# === 编辑器 / IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === 私有面试数据：仅此一处（data/），内容全忽略，白名单仅保留占位 ===
+/data/*
+!/data/.gitkeep
+!/data/README.md
+
+# === 日志 / 临时 ===
+*.log
+
+# === 本地真实 PII 扫描名单（绝不入库；仅本地扫描用） ===
+# 提交版扫描器 scripts/check-pii.sh 不含任何真实 PII，真实名单只存在于此本地文件
+# 或 GitHub Secret PII_PATTERNS（CI 注入）。模板见 scripts/pii-patterns.local.example。
+scripts/pii-patterns.local
+
+# 注意：不要使用 `*简历*.md` 这类宽泛通配符，会误伤 examples/ 下的合法虚构示例。
+# 私有数据只允许放进 data/，由目录约定 + 本 gitignore + scripts/check-pii.sh 三重防护兜底。

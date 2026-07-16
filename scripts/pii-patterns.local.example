@@ -1,0 +1,19 @@
+# scripts/pii-patterns.local.example
+# ----------------------------------------------------------------------------
+# TEMPLATE for project-specific PII patterns. Contains ONLY obvious fake
+# placeholders — never put real PII in this file (it is committed to the repo).
+#
+# Usage:
+#   cp scripts/pii-patterns.local.example scripts/pii-patterns.local
+#   # then edit pii-patterns.local (gitignored) and replace the placeholders
+#   # with the real names / companies / paths you want the scanner to flag.
+#
+# Each non-empty, non-comment line is one regex pattern. They are OR-joined.
+# scripts/pii-patterns.local is gitignored — it stays on your machine only.
+# For CI, set a repository secret named PII_PATTERNS with the same content
+# (see .github/workflows/pii-scan.yml).
+<REPLACE_WITH_REAL_NAME_1>
+<REPLACE_WITH_REAL_NAME_2>
+<REPLACE_WITH_REAL_COMPANY_1>
+<REPLACE_WITH_REAL_BUSINESS_FINGERPRINT_1>
+/Users/<REPLACE_WITH_USERNAME>/Documents/<REPLACE_WITH_PRIVATE_DIR>

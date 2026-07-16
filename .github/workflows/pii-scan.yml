@@ -1,0 +1,30 @@
+name: PII Scan
+
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches: ["main"]
+
+# Same concurrency group cancels superseded runs on the same ref.
+concurrency:
+  group: pii-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pii-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so the git-history scan in check-pii.sh works
+
+      - name: Run PII scan
+        env:
+          # Optional repository secret holding real PII patterns (one per line).
+          # If absent, the scanner falls back to generic detection only.
+          PII_PATTERNS: ${{ secrets.PII_PATTERNS }}
+        run: |
+          chmod +x scripts/check-pii.sh
+          bash scripts/check-pii.sh

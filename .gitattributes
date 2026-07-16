@@ -1,0 +1,13 @@
+# 统一换行符，避免中文 Markdown 在不同平台被篡改
+* text=auto
+
+# Markdown / 文本统一按 UTF-8 文本处理
+*.md   text eol=lf
+*.txt  text eol=lf
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# Windows / macOS 二进制产物永远不当成文本
+*.zip  binary
+.DS_Store binary
