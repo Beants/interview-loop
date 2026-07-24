@@ -24,6 +24,13 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(git -C "$SCRIPT_DIR/.." rev-parse --show-toplevel 2>/dev/null)"
 [ -z "$REPO_ROOT" ] && REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Optional positional arg: an arbitrary directory to scan instead of the repo
+# working tree (out-of-tree output self-check — see docs/privacy.md). Default
+# (no arg, e.g. CI) scans REPO_ROOT — identical to prior behavior.
+# Note: project-specific patterns are still loaded from REPO_ROOT; git-history
+# scan (step 3) always runs on REPO_ROOT regardless of TARGET.
+TARGET="${1:-$REPO_ROOT}"
+
 STATUS=0
 
 # --- generic patterns (NO real PII) ------------------------------------------
@@ -48,17 +55,19 @@ else
   PATTERN="$GENERIC"
 fi
 
-echo "== [1/3] content scan: working tree (excl .git and local pattern file) =="
-if grep -rInE -I --exclude-dir=.git --exclude=pii-patterns.local "$PATTERN" "$REPO_ROOT"; then
+echo "== [1/3] content scan: $TARGET (excl .git and local pattern file) =="
+if grep -rInE -I --exclude-dir=.git --exclude=pii-patterns.local "$PATTERN" "$TARGET"; then
   STATUS=1
 fi
 
-echo "== [2/3] artifact scan: working tree (.DS_Store / __MACOSX/ / *.zip must be absent) =="
-if find "$REPO_ROOT" -path "$REPO_ROOT/.git" -prune -o -type f \( -name '.DS_Store' -o -path '*__MACOSX*' -o -name '*.zip' \) -print | grep .; then
+echo "== [2/3] artifact scan: $TARGET (.DS_Store / __MACOSX/ / *.zip must be absent) =="
+if find "$TARGET" -path "$TARGET/.git" -prune -o -type f \( -name '.DS_Store' -o -path '*__MACOSX*' -o -name '*.zip' \) -print | grep .; then
   STATUS=1
 fi
 
-if git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if [ "$TARGET" != "$REPO_ROOT" ]; then
+  echo "== [3/3] git history: skipped (scanning an out-of-tree TARGET; repo history is covered by the default no-arg run / CI) =="
+elif git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   REVS="$(git -C "$REPO_ROOT" rev-list --all 2>/dev/null)"
   echo "== [3/3] content + artifact scan: git history (all commits) =="
   if [ -n "$REVS" ]; then
